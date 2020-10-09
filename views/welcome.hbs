@@ -32,7 +32,7 @@ details[open] {
 }
 .content {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: baseline;
     overflow: hidden;
 }
@@ -46,13 +46,13 @@ details[open] {
 }
 </style>
 
-<h1 class="heading" style="text-align: center;">spotylists</h1>
+<h1 class="heading" style="text-align: center;">spotylister</h1>
 <h2 style="text-align: center;">The songs and artists you can't get enough of</h2>
 <div class="content">
 <div style="padding: 0 1rem;">
 <h2 style="color: rgb(255, 0, 128);">Tracks</h2>
 <ol style="border-top: 1px gray solid;">
-{{#each items}}
+{{#each tracks}}
 <li style="border-bottom: 1px gray solid; padding: 0;">
 <details  style="padding: 1rem 0rem;" class="details">
         <summary class="summary">
@@ -68,14 +68,13 @@ details[open] {
 <div style="padding: 0 1rem; overflow:hidden">
 <h2 style="color: rgb(255, 0, 128);">Artists</h2>
 <ol style="border-top: 1px gray solid;">
-{{#each items}}
+{{#each artists}}
 <li style="border-bottom: 1px gray solid; padding: 0;">
 <details  style="padding: 1rem 0rem;" class="details">
         <summary class="summary">
         <div>{{this.name}}</div>
         </summary>
-        <div>{{this.artists.[0].name}}</div>
-        <img src="{{this.album.images.[1].url}}" class="card-img-top" alt="">
+        <img src="{{this.images.[1].url}}" class="card-img-top" alt="">
 </details>
 </li>
 {{/each}}

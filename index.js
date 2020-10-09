@@ -5,6 +5,7 @@ const axios = require('axios');
 const session = require('express-session');
 const crypto = require('crypto');
 const querystring = require('querystring');
+const { promises } = require('fs');
 require('dotenv').config()
 const app = express()
 app.set('view engine', 'hbs');
@@ -16,7 +17,7 @@ const port =  process.env.PORT || 3000
 const client = {
     client_id: process.env.Client_id,
     client_secret: process.env.Client_secret,
-    redirect_uri: "https://fathomless-escarpment-03995.herokuapp.com/callback"
+    redirect_uri: "http://localhost:3000/callback"
 }
 const authProvider = {
     authEndpoint: 'https://accounts.spotify.com/authorize',
@@ -91,27 +92,27 @@ app.get('/callback', (req, res) =>{
 app.get('/welcome', (req, res) => {
 if(access_token) {
     const fetch_lists = async () => {
-        var headers = {
-            'Authorization': 'Bearer ' + access_token
-            };
+        const axiosInstance = axios.create ({
+            baseURL : 'https://api.spotify.com/v1/me/top/',
+            headers: {
+                'Authorization': 'Bearer ' + access_token
+                }
+          })
         try{
-            const response = await axios({
-                method: 'get',
-                headers: headers,
-                url: 'https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50'
-
-            })
-            res.render('welcome', {items: response.data.items})
+            const [response1, response2] = await Promise.all([
+                axiosInstance.get('tracks?time_range=short_term&limit=25'),
+                axiosInstance.get('artists?time_range=short_term&limit=25')
+            ])
+            res.render('welcome', {tracks: response1.data.items, artists: response2.data.items})
         } catch (error) {
-            console.log(err)
-            return
+            res.render('error', {error: error.response.data.message})
         }   
     }
     fetch_lists()
 } else {
-    console.log('error')
+    res.redirect('/')
 }
 })
 app.listen(port, () => {
-    // console.log(`Spotylistslistening at http://localhost:${port}`)
+    console.log(`Spotylistslistening at http://localhost:${port}`)
   })
