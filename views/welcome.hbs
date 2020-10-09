@@ -1,0 +1,85 @@
+<style>
+.heading {
+    font-size: 3rem;
+}
+.summary::-webkit-details-marker {
+    display: none
+}
+.summary:after {
+    content: '+';
+}
+
+details[open] summary:after {
+  content: "-";
+}
+details {
+    transition: height .5s ease;
+    overflow: hidden;
+}
+details:not([open]) {
+    height: 1rem;
+}
+details[open] {
+    height: 25rem;
+}
+.summary {
+    border: none;
+    outline: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    overflow: hidden;
+}
+.content {
+    display: flex;
+    justify-content: space-around;
+    align-items: baseline;
+    overflow: hidden;
+}
+@media (max-width: 768px) {
+    .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+}
+</style>
+
+<h1 class="heading" style="text-align: center;">spotylists</h1>
+<h2 style="text-align: center;">The songs and artists you can't get enough of</h2>
+<div class="content">
+<div style="padding: 0 1rem;">
+<h2 style="color: rgb(255, 0, 128);">Tracks</h2>
+<ol style="border-top: 1px gray solid;">
+{{#each items}}
+<li style="border-bottom: 1px gray solid; padding: 0;">
+<details  style="padding: 1rem 0rem;" class="details">
+        <summary class="summary">
+        <div>{{this.name}}</div>
+        </summary>
+        <div>{{this.artists.[0].name}}</div>
+        <img src="{{this.album.images.[1].url}}" class="card-img-top" alt="">
+</details>
+</li>
+{{/each}}
+</ol>
+</div>
+<div style="padding: 0 1rem; overflow:hidden">
+<h2 style="color: rgb(255, 0, 128);">Artists</h2>
+<ol style="border-top: 1px gray solid;">
+{{#each items}}
+<li style="border-bottom: 1px gray solid; padding: 0;">
+<details  style="padding: 1rem 0rem;" class="details">
+        <summary class="summary">
+        <div>{{this.name}}</div>
+        </summary>
+        <div>{{this.artists.[0].name}}</div>
+        <img src="{{this.album.images.[1].url}}" class="card-img-top" alt="">
+</details>
+</li>
+{{/each}}
+</ol>
+</div>
+</div>
+
