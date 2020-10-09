@@ -44,7 +44,7 @@ app.get('/authorize', (req, res) => {
     if (err) throw err;
     state = buf.toString('hex')
     });
-    res.cookie('state', state, { httpOnly: true, sameSite: "lax", secure });
+    res.cookie('state', state, { httpOnly: true, sameSite: "lax", secure: true });
 const authorizeUrl = buildUrl(authProvider.authEndpoint, {
     queryParams: {
         client_id: client.client_id,
