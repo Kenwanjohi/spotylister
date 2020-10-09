@@ -27,23 +27,24 @@ const authProvider = {
 app.get('/', (req, res) => {
     res.render('home')
 });
-let state 
-crypto.randomBytes(20, (err, buf) => {
-  if (err) throw err;
-  state = buf.toString('hex')
-});
+
 let access_token = null
-app.use(session({
-    name: 'SESSION_ID',
-    secret: process.env.secret,
-    resave: false,
-    saveUninitialized: false,
-    store: new FileStore
-  }))
+// app.use(session({
+//     name: 'SESSION_ID',
+//     secret: process.env.secret,
+//     resave: false,
+//     saveUninitialized: false,
+//     store: new FileStore
+//   }))
 
 app.get('/authorize', (req, res) => {
     access_token = null
-
+    let state 
+    crypto.randomBytes(20, (err, buf) => {
+    if (err) throw err;
+    state = buf.toString('hex')
+    });
+    res.cookie('state', state, { httpOnly: true, sameSite: "lax", secure });
 const authorizeUrl = buildUrl(authProvider.authEndpoint, {
     queryParams: {
         client_id: client.client_id,
@@ -53,7 +54,7 @@ const authorizeUrl = buildUrl(authProvider.authEndpoint, {
         scope: "user-top-read"
     }
 });
-    req.session.state = state
+    // req.session.state = state
     res.redirect(authorizeUrl);
 })
 const stringToBase64 = (clientId, clientSecret) => {
@@ -62,7 +63,7 @@ const stringToBase64 = (clientId, clientSecret) => {
     return buff.toString('base64');
 }
 app.get('/callback', (req, res) =>{
-    if(req.query.state !== req.session.state) {
+    if(req.query.state !== req.cookies.state) {
         res.render('error', {error: 'State doesn\'t match'})
     }
     const code = req.query.code;
