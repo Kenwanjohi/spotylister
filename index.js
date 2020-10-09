@@ -13,7 +13,7 @@ app.engine('hbs', exphbs({
     defaultLayout: 'main',
     extname: '.hbs'
     }));
-const port =  process.env.PORT || 3000
+const port =  process.env.PORT
 const client = {
     client_id: process.env.Client_id,
     client_secret: process.env.Client_secret,
@@ -114,5 +114,5 @@ if(access_token) {
 }
 })
 app.listen(port, () => {
-    console.log(`Spotylistslistening at http://localhost:${port}`)
+    // console.log(`Spotylistslistening at http://localhost:${port}`)
   })
