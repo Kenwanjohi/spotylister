@@ -36,14 +36,13 @@ let access_token = null
 //     saveUninitialized: false,
 //     store: new FileStore
 //   }))
-
-app.get('/authorize', (req, res) => {
-    access_token = null
-    let state 
+let state 
     crypto.randomBytes(20, (err, buf) => {
     if (err) throw err;
     state = buf.toString('hex')
     });
+app.get('/authorize', (req, res) => {
+    access_token = null
     res.cookie('state', state, { httpOnly: true, sameSite: "lax", secure: true });
 const authorizeUrl = buildUrl(authProvider.authEndpoint, {
     queryParams: {
