@@ -5,6 +5,7 @@ const axios = require('axios');
 const session = require('express-session');
 const crypto = require('crypto');
 const querystring = require('querystring');
+var FileStore = require('session-file-store')(session);
 const { promises } = require('fs');
 require('dotenv').config()
 const app = express()
@@ -13,7 +14,7 @@ app.engine('hbs', exphbs({
     defaultLayout: 'main',
     extname: '.hbs'
     }));
-const port =  process.env.PORT
+const port =  process.env.PORT || 3000
 const client = {
     client_id: process.env.Client_id,
     client_secret: process.env.Client_secret,
@@ -37,6 +38,7 @@ app.use(session({
     secret: process.env.secret,
     resave: true,
     saveUninitialized: true,
+    store: new FileStore
   }))
 
 app.get('/authorize', (req, res) => {
@@ -114,5 +116,5 @@ if(access_token) {
 }
 })
 app.listen(port, () => {
-    // console.log(`Spotylistslistening at http://localhost:${port}`)
+    console.log(`Spotylistslistening at http://localhost:${port}`)
   })
