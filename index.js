@@ -36,8 +36,8 @@ let access_token = null
 app.use(session({
     name: 'SESSION_ID',
     secret: process.env.secret,
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     store: new FileStore
   }))
 
