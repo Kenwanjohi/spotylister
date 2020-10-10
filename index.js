@@ -2,11 +2,10 @@ const express = require('express')
 const exphbs = require("express-handlebars")
 const buildUrl = require('build-url');
 const axios = require('axios');
-const session = require('express-session');
 const crypto = require('crypto');
 const querystring = require('querystring');
+const session = require('express-session');
 var FileStore = require('session-file-store')(session);
-const { promises } = require('fs');
 require('dotenv').config()
 const app = express()
 app.set('view engine', 'hbs');
@@ -18,7 +17,7 @@ const port =  process.env.PORT || 3000
 const client = {
     client_id: process.env.Client_id,
     client_secret: process.env.Client_secret,
-    redirect_uri: "https://nameless-badlands-53247.herokuapp.com/callback"
+    redirect_uri: "http://localhost:3000/callback"
 }
 const authProvider = {
     authEndpoint: 'https://accounts.spotify.com/authorize',
@@ -29,31 +28,31 @@ app.get('/', (req, res) => {
 });
 
 let access_token = null
-// app.use(session({
-//     name: 'SESSION_ID',
-//     secret: process.env.secret,
-//     resave: false,
-//     saveUninitialized: false,
-//     store: new FileStore
-//   }))
-let state 
+app.use(session({
+    name: 'SESSION_ID',
+    secret: process.env.secret,
+    resave: false,
+    saveUninitialized: false,
+    store: new FileStore
+  }))
+
+app.get('/authorize', (req, res) => {
+    access_token = null
+    let state 
     crypto.randomBytes(20, (err, buf) => {
     if (err) throw err;
     state = buf.toString('hex')
     });
-app.get('/authorize', (req, res) => {
-    access_token = null
-    res.cookie('state', state, { httpOnly: true, sameSite: "lax", secure: true });
+    req.session.state = state
 const authorizeUrl = buildUrl(authProvider.authEndpoint, {
     queryParams: {
         client_id: client.client_id,
         redirect_uri: client.redirect_uri,
-        state,
+        state: state,
         response_type: "code",
         scope: "user-top-read"
     }
 });
-    // req.session.state = state
     res.redirect(authorizeUrl);
 })
 const stringToBase64 = (clientId, clientSecret) => {
@@ -62,7 +61,7 @@ const stringToBase64 = (clientId, clientSecret) => {
     return buff.toString('base64');
 }
 app.get('/callback', (req, res) =>{
-    if(req.query.state !== req.cookies.state) {
+    if(req.query.state !== req.session.state) {
         res.render('error', {error: 'State doesn\'t match'})
     }
     const code = req.query.code;
@@ -92,7 +91,9 @@ app.get('/callback', (req, res) =>{
     accessToken()   
 })
 app.get('/welcome', (req, res) => {
-if(access_token) {
+if(!access_token) {
+    res.redirect('/')
+} else {
     const fetch_lists = async () => {
         const axiosInstance = axios.create ({
             baseURL : 'https://api.spotify.com/v1/me/top/',
@@ -105,14 +106,13 @@ if(access_token) {
                 axiosInstance.get('tracks?time_range=short_term&limit=25'),
                 axiosInstance.get('artists?time_range=short_term&limit=25')
             ])
+            console.log(response1)
             res.render('welcome', {tracks: response1.data.items, artists: response2.data.items})
         } catch (error) {
             res.render('error', {error: error.response.data.message})
         }   
     }
     fetch_lists()
-} else {
-    res.redirect('/')
 }
 })
 app.listen(port, () => {
