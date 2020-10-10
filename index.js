@@ -17,7 +17,7 @@ const port =  process.env.PORT || 3000
 const client = {
     client_id: process.env.Client_id,
     client_secret: process.env.Client_secret,
-    redirect_uri: "http://localhost:3000/callback"
+    redirect_uri: "https://nameless-badlands-53247.herokuapp.com/callback"
 }
 const authProvider = {
     authEndpoint: 'https://accounts.spotify.com/authorize',
