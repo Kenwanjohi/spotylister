@@ -103,8 +103,8 @@ if(!access_token) {
           })
         try{
             const [response1, response2] = await Promise.all([
-                axiosInstance.get('tracks?time_range=short_term&limit=25'),
-                axiosInstance.get('artists?time_range=short_term&limit=25')
+                axiosInstance.get('tracks?time_range=long_term&limit=25'),
+                axiosInstance.get('artists?time_range=long_term&limit=25')
             ])
             console.log(response1)
             res.render('welcome', {tracks: response1.data.items, artists: response2.data.items})
