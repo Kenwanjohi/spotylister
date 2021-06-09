@@ -18,6 +18,7 @@ const client = {
     client_id: process.env.Client_id,
     client_secret: process.env.Client_secret,
     redirect_uri: "https://nameless-badlands-53247.herokuapp.com/callback"
+    // redirect_uri:"http://localhost:3000/callback"    
 }
 const authProvider = {
     authEndpoint: 'https://accounts.spotify.com/authorize',
@@ -27,7 +28,6 @@ app.get('/', (req, res) => {
     res.render('home')
 });
 
-let access_token = null
 app.use(session({
     name: 'SESSION_ID',
     secret: process.env.secret,
@@ -35,10 +35,10 @@ app.use(session({
     saveUninitialized: false,
     store: new FileStore
   }))
-
+  let state 
 app.get('/authorize', (req, res) => {
     access_token = null
-    let state 
+    
     crypto.randomBytes(20, (err, buf) => {
     if (err) throw err;
     state = buf.toString('hex')
@@ -50,7 +50,7 @@ const authorizeUrl = buildUrl(authProvider.authEndpoint, {
         redirect_uri: client.redirect_uri,
         state: state,
         response_type: "code",
-        scope: "user-top-read"
+        scope: "user-top-read", 
     }
 });
     res.redirect(authorizeUrl);
@@ -81,16 +81,18 @@ app.get('/callback', (req, res) =>{
                 })
             })
             console.log(response.data)
-            access_token = response.data.access_token
+            req.session.accessToken = response.data.access_token
             res.redirect('/welcome')
         } catch (err) {
-            console.log(err)
             return
         }
     }
-    accessToken()   
+    accessToken()  
+    
 })
 app.get('/welcome', (req, res) => {
+const { accessToken } = req.session;
+const access_token = accessToken
 if(!access_token) {
     res.redirect('/')
 } else {
@@ -106,7 +108,6 @@ if(!access_token) {
                 axiosInstance.get('tracks?time_range=long_term&limit=25'),
                 axiosInstance.get('artists?time_range=long_term&limit=25')
             ])
-            console.log(response1)
             res.render('welcome', {tracks: response1.data.items, artists: response2.data.items})
         } catch (error) {
             res.render('error', {error: error.response.data.message})
@@ -115,6 +116,10 @@ if(!access_token) {
     fetch_lists()
 }
 })
+
 app.listen(port, () => {
     console.log(`Spotylistslistening at http://localhost:${port}`)
   })
+
+
+
